@@ -1,0 +1,51 @@
+body {
+  margin: 0px 0px 0px 0px;
+}
+
+#popup {
+  max-height: 600px;
+  width: 275px;
+}
+
+#popup > * {
+  padding: 10px 10px 10px 10px;
+}
+
+#header {
+  font-size: large;
+  font-weight: bold;
+}
+
+.shade {
+  background-color: rgb(244,244,244);
+}
+
+.horizontal_even {
+  display: flex;
+  justify-content: space-between;
+}
+
+.bold {
+  font-weight: bold;
+}
+
+.calls_count {
+  color: rgb(58, 167, 87);
+}
+
+div#seperator {
+  background-color: black;
+  height: 1px;
+  padding: 0px 0px 0px 0px;
+  margin: 0px 10px 0px 10px;
+}
+
+input {
+  width: 200px;
+}
+
+button {
+  height: 30px;
+  width: 30px;
+  outline: none;
+}

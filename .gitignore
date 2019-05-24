@@ -1,6 +1,8 @@
 
 # Web
+.vscode/
 /node_modules
-package-lock.json
-/public
+public/bundles.js
+public/bundles.map.js
 .DS_Store
+.env
