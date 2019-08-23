@@ -5,34 +5,51 @@
       <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
     </head>
   <body>
-    <div id="popup">
+    <div id="authenticate_popup">
+        <div id="phone_info">
+          <div id="enter_phone">
+            <input id="phone" type="text" name="phone"  placeholder="Enter phone number here">
+            <button id="activate" class="authenticate">ACTIVATE</button>
+            <div id="info">This will send an activation code to your phone. Then verify your code and you're all set!</div>
+          </div>
+          <div id="enter_code" class="hidden">
+              <input id="code" type="text" name="code"  placeholder="Enter validation code here">
+              <button id="validate" class="authenticate">VALIDATE</button>
+              <div id="info">Enter the validation code sent to your phone. Then you can send a call to your phone by double-clicking the "Nah" Icon</div>
+          </div>
+        </div>
+    </div>
+    <div id="main_popup" class="hidden">
       <div id="header">
-        Nah | Not Today
+        BS | BLOCKER
       </div>
       <div class="shade">
         <div class="bold">Uncomfortable conversations avoided: </div>
           <div class="horizontal_even">
             <div>
-                <span class="calls_count">6</span>
+                <span id="numPersonalCalls" class="calls_count">6</span>
                 by you
               </div>
               <div>
-                <span class="calls_count">1518</span>
+                <span id="numEveryonesCalls" class="calls_count">1518</span>
                 by everyone
               </div>
           </div> 
       </div>
       <div>
-        <!-- Replace this with static element-->
-        <input type="text" name="phone" id="phone" placeholder="Enter phone number here">
-        <button id="nope"></button>
+
+        <button id="nope">Call</button>
+        <button id="update">Update</button>
       </div>
-      <!-- <div id="seperator"></div> -->
-      <!-- <button id="changeColor"></button> -->
       <div id="seperator"></div>
-      <div id="donate">
-        <div>Funding bar placeholder</div>
-        <div>Love this? Help keep it running by donating!</div>
+      <div>
+        <div id="funding_barContainer">
+          <div id="funding_bar_background">
+            <div id="funding_bar"></div>
+          </div>
+          <div id="numCalls"></div>
+        </div>
+        <div id="donate">Love this? Consider donating!</div>
       </div>
   </div>
   <script src="popup.js"></script>

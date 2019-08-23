@@ -2,30 +2,26 @@ body {
   margin: 0px 0px 0px 0px;
 }
 
-#popup {
+#authenticate_popup {
+  max-height: 600px;
+  width: 250px;
+}
+
+#authenticate_popup > * {
+  padding: 10px 10px 10px 10px;
+}
+
+#main_popup {
   max-height: 600px;
   width: 275px;
 }
 
-#popup > * {
+#main_popup > * {
   padding: 10px 10px 10px 10px;
 }
 
 #header {
   font-size: large;
-  font-weight: bold;
-}
-
-.shade {
-  background-color: rgb(244,244,244);
-}
-
-.horizontal_even {
-  display: flex;
-  justify-content: space-between;
-}
-
-.bold {
   font-weight: bold;
 }
 
@@ -44,8 +40,96 @@ input {
   width: 200px;
 }
 
+input:-webkit-autofill {
+  -webkit-text-fill-color:rgb(110, 117, 112) !important;
+}
+
 button {
-  height: 30px;
-  width: 30px;
+  background-color: #6fde6f;
+  /* height: 30px; */
+  width: 100px;
   outline: none;
+}
+
+#phone_info {
+  width: 230px;
+}
+
+#phone_info > * > * {
+  height: 35px;
+  width: 100%;
+  padding:0 0 0 0;
+  border: none;
+  margin-bottom: 5px;
+}
+
+#phone_info input {
+  background-color: rgb(241, 241, 241);
+  color: rgb(110, 117, 112) !important;
+  font-size: small;
+  text-align: center;
+  border: none;
+}
+
+button.authenticate {
+  color: white;
+  font-weight: bold;
+  font-size: small;
+}
+
+#info {
+  font-size: smaller;
+  text-align: center;
+}
+
+#funding_bar_background {
+  width: 100%;
+  border-radius: 10px;
+  background-color: #e8e8e8;
+}
+
+#funding_bar {
+  width: 50%;
+  border-radius: 10px;
+  height: 15px;
+  margin-bottom: 7px;
+}
+.high_funding {
+  background-color:#6fde6f;
+}
+
+.medium_funding {
+  background-color: #e2e23b;
+}
+
+.low_funding {
+  background-color: #f16565;
+}
+
+#donate {
+  margin-top: 15px;
+  color: #1855ed;
+}
+
+
+/* Utility classes */
+.hidden {
+  display: none;
+}
+
+.full_width {
+  width: 100%;
+}
+
+.shade {
+  background-color: rgb(244,244,244);
+}
+
+.horizontal_even {
+  display: flex;
+  justify-content: space-between;
+}
+
+.bold {
+  font-weight: bold;
 }

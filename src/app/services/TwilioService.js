@@ -1,5 +1,9 @@
 import axios from'axios';
 
+export function getTwilioAccountBalance() {
+  return axios.get('https://localhost:8080/balance');
+}
+
 export function getTopArtists(access_token, timeRange, limit) {
   const config = { headers: { 'Authorization': 'Bearer ' + access_token } };
   return axios.get(`https://api.spotify.com/v1/me/top/artists?limit=${limit}&time_range=${timeRange}`, config);

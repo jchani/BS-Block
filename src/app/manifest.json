@@ -2,8 +2,10 @@
   "name": "Getting Started Example",
   "version": "1.0",
   "description": "Build an Extension!",
-  "permissions": ["activeTab","declarativeContent","storage",
-     "http://localhost:*.com","https://unpkg.com/axios/dist/axios.min.js"],
+  "permissions": ["activeTab","declarativeContent","storage", "cookies",
+     "http://localhost/*",
+     "https://unpkg.com/axios/dist/axios.min.js",
+     "https://spotify-lineup.herokuapp.com/"],
   "content_security_policy": "script-src 'self' https://unpkg.com/axios/dist/axios.min.js; object-src 'self'",
   "options_page": "options.html",
   "background": {
