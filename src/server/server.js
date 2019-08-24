@@ -53,7 +53,7 @@ app.get('/validate', function(request, response) {
   if(!phone || !code) return response.status(401).send('No phone or code sent in request'); 
 
   //TODO: refactor to use promise instead of callback
-  return db.validateAccessToken(request, response, phone, code, x => x ? response.status(200).send() : response.status(401).send('Incorrect phone number or token')) 
+  return db.validatePhoneAndAccessToken(request, response, phone, code, x => x ? response.status(200).send() : response.status(401).send('Incorrect phone number or token')) 
 });
 
 /**
@@ -88,27 +88,36 @@ app.get('/balance', function(request, response) {
  * Checks phone and token. If valid (exists in db), then call phone number
  */
 app.put('/call', function(request, response) {
-  //TODO: remove this testing call
-  //const client = twilio(apiKey, apiSecret, { accountSid: accountId });
+  console.log("Succesfully called server with call request");
+  const phone = request.headers['phone-number'];
+  const token = request.headers['access-token'];
 
-  //client.api.accounts.each(accounts => console.log(accounts.sid));
-  // client.calls
-  //     .create({
-  //        url: 'http://demo.twilio.com/docs/voice.xml',
-  //        to: '+19093446762',
-  //        from: '+14088829909'
-  //      })
-  //     .then(call => {
-  //       console.log(call.sid)
-  //     });
-  console.log("Succesfully called server");
+  const isValid = db.validatePhoneAndAccessToken(phone, token, x => x);
+  if (isValid) {
+    const client = twilio(apiKey, apiSecret, { accountSid: accountId });
+
+    client.api.accounts.each(accounts => console.log(accounts.sid));
+    client.calls
+        .create({
+           url: 'http://demo.twilio.com/docs/voice.xml',
+           to: phone,
+           from: '+14088829909'
+         })
+        .then(call => {
+          db.incrementCalls();
+        });
+  }
   response.json({ info: 'Node.js, Express, and Postgres API' })
 
   //TODO: update number of calls in database
 });
 
+
+/*
+ * TODO: get rid of some of these generic methods
+ */
 app.get('/users', db.getAllUsersCallData)
-app.get('/users/:phone', db.getCallDataById)
+app.get('/users/:phone', db.getCallDataByPhone)
 app.post('/users', db.createUser)
 app.put('/users/:phone', db.updateUser)
 app.delete('/users/:phone', db.deleteUser)

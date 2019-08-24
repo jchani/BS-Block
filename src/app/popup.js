@@ -51,6 +51,11 @@ validateButton.onclick = function(element) {
       chrome.storage.sync.set({["BsBlock_token"]: code});
       document.getElementById('authenticate_popup').setAttribute('class', 'hidden');
       document.getElementById('main_popup').classList.remove('hidden');
+
+      //Set default headers so that every request will have phone and access code
+      axios.defaults.headers.common['phone-number'] = phoneNum;
+      axios.defaults.headers.common['access-token'] = code;
+
       populateData();
     }).catch(response => {
       console.log(response);
@@ -63,27 +68,28 @@ validateButton.onclick = function(element) {
 // --- MAIN POPUP FUNCTIONALITY ---
 callButton.onclick = function(element) {
   let phoneNumber = phoneElement.value;
-  axios.get('http://localhost:8080/', {})
-    .then(response => {
-      console.log("call sent successfully");
-
-      //TODO: update number of calls locally 
-    });
-}
-
-
-callButton.onclick = function(element) {
   chrome.storage.sync.get(["BsBlock_phone"], function(response1) {
     chrome.storage.sync.get(["BsBlock_token"], function(response2) {
-      if(response1.BsBlock_phone && response2.BsBlock_token) { 
-        //Put phone number and access token in header 
-        axios.get('http://localhost:8080/call', {})
-        .then(response => {
-          console.log("call sent successfully");
+      if(response1.BsBlock_phone && response2.BsBlock_token) { //check if phone number has been validated
+        console.log(`phone number and token found`);
+
+        const config = {
+          headers: {
+            "phone-number": response1.BsBlock_phone,
+            "access-token": response2.BsBlock_token
+          }
+        }
+        axios.put('http://localhost:8080/call', {}, config)
+          .then(response => {
+            console.log("call sent successfully");
+
+            //TODO: update number of calls locally 
+          });
+            } else {
+              console.log(`could not retrive phone number or token`);
+            }
+          });
         });
-      }
-    });
-  });
 }
 
 updateButton.onclick = function(element) {
