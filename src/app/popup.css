@@ -106,6 +106,10 @@ button.authenticate {
   background-color: #f16565;
 }
 
+#numCalls {
+  padding-right: 3px;
+}
+
 #donate {
   margin-top: 15px;
   color: #1855ed;
@@ -125,8 +129,11 @@ button.authenticate {
   background-color: rgb(244,244,244);
 }
 
-.horizontal_even {
+.horizontal{
   display: flex;
+}
+
+.even {
   justify-content: space-between;
 }
 

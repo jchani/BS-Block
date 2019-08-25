@@ -13,11 +13,11 @@ function initial() {
   console.log(`initial is being reached`);
   chrome.storage.sync.get(["BsBlock_phone"], function(response1) {
     chrome.storage.sync.get(["BsBlock_token"], function(response2) {
-      if(response1.BsBlock_phone && response2.BsBlock_token) { //check if phone number has been validated
+      if(response1.BsBlock_phone && response2.BsBlock_token) { //check if user has gone through validation process
         console.log(`auth passed`);
         document.getElementById('authenticate_popup').setAttribute('class', 'hidden');
         document.getElementById('main_popup').classList.remove('hidden');
-        populateData();
+        populateData(response1.BsBlock_phone, response2.BsBlock_token);
       } else {
         document.getElementById('enter_code').setAttribute('class', 'hidden');
         document.getElementById('enter_phone').classList.remove('hidden');
@@ -50,46 +50,29 @@ validateButton.onclick = function(element) {
       chrome.storage.sync.set({["BsBlock_phone"]: phoneNum});  
       chrome.storage.sync.set({["BsBlock_token"]: code});
       document.getElementById('authenticate_popup').setAttribute('class', 'hidden');
-      document.getElementById('main_popup').classList.remove('hidden');
+      document.getElementById('main_popup').classList.remove('hidden')
 
-      //Set default headers so that every request will have phone and access code
-      axios.defaults.headers.common['phone-number'] = phoneNum;
-      axios.defaults.headers.common['access-token'] = code;
-
-      populateData();
+      populateData(phoneNum, code);
     }).catch(response => {
       console.log(response);
     });
-
-
   }
 }
 
 // --- MAIN POPUP FUNCTIONALITY ---
 callButton.onclick = function(element) {
   let phoneNumber = phoneElement.value;
-  chrome.storage.sync.get(["BsBlock_phone"], function(response1) {
-    chrome.storage.sync.get(["BsBlock_token"], function(response2) {
-      if(response1.BsBlock_phone && response2.BsBlock_token) { //check if phone number has been validated
-        console.log(`phone number and token found`);
+  axios.put('http://localhost:8080/call', {})
+    .then(response => {
+      console.log("call sent successfully");
+      let numCallsStr = document.getElementById('numCalls').innerText; //skip DB hit and just get it from DOM
+      populateFundingUI(Number.parseInt(numCallsStr) - 1);
 
-        const config = {
-          headers: {
-            "phone-number": response1.BsBlock_phone,
-            "access-token": response2.BsBlock_token
-          }
-        }
-        axios.put('http://localhost:8080/call', {}, config)
-          .then(response => {
-            console.log("call sent successfully");
-
-            //TODO: update number of calls locally 
-          });
-            } else {
-              console.log(`could not retrive phone number or token`);
-            }
-          });
-        });
+      let numCallsElement = document.getElementById('numPersonalCalls');
+      let numEveryoneCallsElement = document.getElementById('numEveryonesCalls');
+      numCallsElement.innerText = Number.parseInt(numCallsElement.innerText) + 1
+      numEveryoneCallsElement.innerText = Number.parseInt(numEveryoneCallsElement.innerText) + 1
+  });
 }
 
 updateButton.onclick = function(element) {
@@ -97,38 +80,18 @@ updateButton.onclick = function(element) {
 }
 
 
-function populateData() {
-  let phoneNumber = '9093446762';
+function populateData(phoneNum, accessToken) {
+  //Set default headers so that every request will have phone and access code
+  axios.defaults.headers.common['phone-number'] = phoneNum;
+  axios.defaults.headers.common['access-token'] = accessToken;
 
   axios.get(`http://localhost:8080/balance/`, {})
   .then(response => {
-    let numCallsElement = document.getElementById('numCalls');
-    let funding_bar = document.getElementById('funding_bar');
-    let numCalls = response.data;
-    if(numCalls != undefined) {
-      numCallsElement.innerText = numCalls + ` calls left until this runs out of funding.`;
-      //1200 calls would fill the funding bar to 100%
-      let widthPercentage = 1800;
-      //let widthPercentage = (numCalls / 1200) * 100;
-      funding_bar.setAttribute('style', `width: ${widthPercentage}%`);
-      if(widthPercentage > 100) {
-        funding_bar.setAttribute('style', `width: ${100}%`);
-      }
-
-      if(widthPercentage > 50) {
-        funding_bar.setAttribute('class', 'high_funding');
-      } else if(widthPercentage > 30) {
-        funding_bar.setAttribute('class', 'medium_funding');
-      } else {
-        funding_bar.setAttribute('class', 'low_funding');
-      }
-    } else {
-      numCallsElement.innerText = '0';
-      funding_bar.setAttribute('style', `width: ${1}%`);
-      funding_bar.setAttribute('style', `background-color: red`)
-    }
+    populateFundingUI(response.data);
   });
 
+  //TODO: refactor all of these requests into one. This is the only place any of these endpoints are hit
+  let phoneNumber = '9093446762';
   axios.get(`http://localhost:8080/users/${phoneNumber}`, {})
   .then(response => {
     let personalCallsCount = document.getElementById('numPersonalCalls');
@@ -150,4 +113,31 @@ function populateData() {
       everyoneCallsCount.innerText = '0';
     }
   });
+}
+
+function populateFundingUI(numCalls) {
+  let numCallsElement = document.getElementById('numCalls');
+  let funding_bar = document.getElementById('funding_bar');
+  if(numCalls != undefined) {
+    numCallsElement.innerText = numCalls;
+    //1200 calls would fill the funding bar to 100%
+    // let widthPercentage = 1800;
+    let widthPercentage = (numCalls / 1200) * 100;
+    funding_bar.setAttribute('style', `width: ${widthPercentage}%`);
+    if(widthPercentage > 100) {
+      funding_bar.setAttribute('style', `width: ${100}%`);
+    }
+
+    if(widthPercentage > 50) {
+      funding_bar.setAttribute('class', 'high_funding');
+    } else if(widthPercentage > 30) {
+      funding_bar.setAttribute('class', 'medium_funding');
+    } else {
+      funding_bar.setAttribute('class', 'low_funding');
+    }
+  } else {
+    numCallsElement.innerText = '0';
+    funding_bar.setAttribute('style', `width: ${1}%`);
+    funding_bar.setAttribute('style', `background-color: red`)
+  }
 }
