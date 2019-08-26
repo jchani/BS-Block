@@ -23,6 +23,27 @@ body {
 #header {
   font-size: large;
   font-weight: bold;
+  display:flex;
+}
+
+#header:hover {
+  cursor: pointer;
+  transform: scale(1.025);
+}
+
+.top_left_padding {
+  padding: 5px 0px 0px 5px; 
+}
+
+#icon {
+  content: url("/images/no_bs_bold.png");
+  height: 30px;
+}
+
+#hint {
+  padding: 5px 0px 0px 30px;
+  font-size: x-small;
+  color: red;
 }
 
 .calls_count {
@@ -49,6 +70,10 @@ button {
   /* height: 30px; */
   width: 100px;
   outline: none;
+}
+
+button:hover {
+  cursor:pointer;
 }
 
 #phone_info {

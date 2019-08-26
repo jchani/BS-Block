@@ -38,7 +38,7 @@ app.get('/activate', (request, response) => {
   //TODO: sanitize phone number
   //Generate non-unique access token.This is ok because the phone number + access token will be used together to verify a user call
   let token = Math.random().toString().substr(2,4);
-  db.storeAccessToken(request, response, phone, token);
+  db.storeAccessToken(phone, token);
 
   //TODO: send access token to client
   response.status(200).send();
@@ -53,7 +53,7 @@ app.get('/validate', (request, response) => {
   if(!phone || !code) return response.status(401).send('No phone or code sent in request'); 
 
   //TODO: refactor to use promise instead of callback
-  db.validatePhoneAndAccessToken(request, response, phone, code)
+  db.validatePhoneAndAccessToken(phone, code)
   .then(isValid => isValid ? response.status(200).send() : response.status(401).send('Incorrect phone number or token')) 
 });
 

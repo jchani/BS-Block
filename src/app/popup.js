@@ -5,7 +5,7 @@ chrome.management.getSelf(x => {if(x.installType == 'development') {isDevMode = 
 
 let activateButton = document.getElementById('activate');
 let validateButton = document.getElementById('validate');; // will instantiate in 2nd step
-let callButton = document.getElementById('nope'); //will instantiate in 3rd step
+let callButton = document.getElementById('header'); //will instantiate in 3rd step
 let phoneElement = document.getElementById('phone');
 let updateButton = document.getElementById('update');
 
@@ -50,13 +50,18 @@ validateButton.onclick = function(element) {
       chrome.storage.sync.set({["BsBlock_phone"]: phoneNum});  
       chrome.storage.sync.set({["BsBlock_token"]: code});
       document.getElementById('authenticate_popup').setAttribute('class', 'hidden');
-      document.getElementById('main_popup').classList.remove('hidden')
+      document.getElementById('main_popup').classList.remove('hidden');
+      document.getElementById('hint').classList.remove('hidden');
 
       populateData(phoneNum, code);
     }).catch(response => {
       console.log(response);
     });
   }
+}
+
+updateButton.onclick = function(element) {
+  initial();
 }
 
 // --- MAIN POPUP FUNCTIONALITY ---
@@ -75,11 +80,6 @@ callButton.onclick = function(element) {
   });
 }
 
-updateButton.onclick = function(element) {
-  initial();
-}
-
-
 function populateData(phoneNum, accessToken) {
   //Set default headers so that every request will have phone and access code
   axios.defaults.headers.common['phone-number'] = phoneNum;
@@ -90,7 +90,7 @@ function populateData(phoneNum, accessToken) {
     populateFundingUI(response.data);
   });
 
-  //TODO: refactor all of these requests into one. This is the only place any of these endpoints are hit
+  //TODO: refactor these 2 requests into one? This is the only place either of these endpoints are hit
   let phoneNumber = '9093446762';
   axios.get(`http://localhost:8080/users/${phoneNumber}`, {})
   .then(response => {

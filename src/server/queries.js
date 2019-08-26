@@ -67,9 +67,9 @@ const updateToken = (phone, token) => {
  */
 const getCallDataByPhone = (phone) => {
   return new Promise((resolve, reject) => {
-    pool.query('SELECT phone, calls FROM users WHERE phone = $1', [phone])
-    .then(results => resolve(results.rows))
-    .catch(error => reject(error))
+    pool.query(`SELECT phone, calls FROM users WHERE phone = ${phone}`)
+    .then(results => results.rows)
+    .catch(error => console.log(error));
   });
 }
 
