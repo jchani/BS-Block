@@ -33,15 +33,27 @@ app.use(express.static(publicPath))
  */
 app.get('/activate', (request, response) => {
   let phone = request.query.phone;
-  if(!phone) return response.status(401).send('No phone or code sent in request'); 
+  if(!phone) return response.status(401).send('No phone number sent in request'); 
+
+  let promises = [];
 
   //TODO: sanitize phone number
   //Generate non-unique access token.This is ok because the phone number + access token will be used together to verify a user call
   let token = Math.random().toString().substr(2,4);
-  db.storeAccessToken(phone, token);
+  let dbPromise = db.storeAccessToken(phone, token);
+  promises.push(dbPromise);
 
   //TODO: send access token to client
-  response.status(200).send();
+  let textPromise = client.messages.create({from: '+14088829909', body: `This is your validation code for BS-Block: ${token}`, to: phone});
+  promises.push(textPromise);
+
+  Promise.all(promises)
+    .then(x => {
+      response.status(200).send()
+    })
+    .catch(x => {
+      response.status(500).send()
+    });
 });
 
 /**
@@ -68,6 +80,7 @@ app.get('/balance', (request, response) => {
     }
   };
   
+  //TODO: cache this result so we're not hitting the api all the time. It's too slow
   axios.get(`https://api.twilio.com/2010-04-01/Accounts/${accountId}/Balance.json`, config)
   .then(apiResponse => {
     /* it doesn't make sense to display the $ amount of funding left because the user doesn't know
@@ -78,6 +91,8 @@ app.get('/balance', (request, response) => {
     let accountVal = apiResponse.data.balance;
     let numCallsLeft = ((accountVal * 100) / 1.55).toFixed(0)
     response.json(numCallsLeft);
+  }).catch(apiResponse => {
+    response.status(502).send();
   })
 });
 
@@ -85,7 +100,7 @@ app.get('/balance', (request, response) => {
  * Checks phone and token. If valid (exists in db), then call phone number
  */
 app.put('/call', (request, response) => {
-  console.log("Succesfully called server with call request");
+  console.log("Succesfully reached server with call request");
   const phone = request.headers['phone-number'];
   const token = request.headers['access-token'];
 
@@ -93,21 +108,24 @@ app.put('/call', (request, response) => {
   .then(isValid => {
     if (isValid) {
       const client = twilio(apiKey, apiSecret, { accountSid: accountId });
-      // client.calls.create({
-      //   url: 'http://demo.twilio.com/docs/voice.xml',
-      //   to: phone,
-      //   from: '+14088829909'
-      // })
-      // .then(call => {
-      // //TODO sanitize inputs to prevent sql injection
+      client.calls.create({
+        url: 'http://demo.twilio.com/docs/voice.xml',
+        to: phone,
+        from: '+14088829909'
+      })
+      .then(call => {
         db.incrementCalls(phone);
-        return response.status(200).send();
-      // })
-      // .catch(x => console.log(x));
+        response.status(200).send();
+      })
+      .catch(x => {
+        console.log("Out of funds or API limit reached");
+        response.status(88).send()
+      });
     }
   })
   .catch(x => {
-    console.log(x)
+    console.log("Invalid phone number + token combination")
+    response.status(401).send();
   });
 });
 

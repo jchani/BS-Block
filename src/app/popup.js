@@ -1,23 +1,36 @@
 window.addEventListener("load", initial, false);
-let isDevMode;
-let phoneNum; 
-chrome.management.getSelf(x => {if(x.installType == 'development') {isDevMode = true}});
+let showUpdateButton = false;
 
-let activateButton = document.getElementById('activate');
-let validateButton = document.getElementById('validate');; // will instantiate in 2nd step
-let callButton = document.getElementById('header'); //will instantiate in 3rd step
+//For development to check if values are updated properly
+if(showUpdateButton) {
+  let mainPopupElement = document.getElementById('main_popup');
+  let updateButton = document.createElement('button');
+  updateButton.innerText = "Update";
+  mainPopupElement.appendChild(updateButton);
+  updateButton.onclick = function(element) {
+    initial();
+  }
+}
+
+let phoneNum; 
+let accessToken;
+let activateButton = document.getElementById('activate'); //visible in 1st step
+let validateButton = document.getElementById('validate');; // will be visible in 2nd step
+let callButton = document.getElementById('header'); //will be visible in 3rd step
 let phoneElement = document.getElementById('phone');
-let updateButton = document.getElementById('update');
 
 function initial() {
   console.log(`initial is being reached`);
   chrome.storage.sync.get(["BsBlock_phone"], function(response1) {
     chrome.storage.sync.get(["BsBlock_token"], function(response2) {
-      if(response1.BsBlock_phone && response2.BsBlock_token) { //check if user has gone through validation process
+      phoneNum = response1.BsBlock_phone;
+      accessToken = response2.BsBlock_token;
+      if(phoneNum && accessToken) { //check if user has gone through validation process
         console.log(`auth passed`);
         document.getElementById('authenticate_popup').setAttribute('class', 'hidden');
         document.getElementById('main_popup').classList.remove('hidden');
-        populateData(response1.BsBlock_phone, response2.BsBlock_token);
+        setHeaders()
+        populateData();
       } else {
         document.getElementById('enter_code').setAttribute('class', 'hidden');
         document.getElementById('enter_phone').classList.remove('hidden');
@@ -42,18 +55,18 @@ activateButton.onclick = function(element) {
 }
 
 validateButton.onclick = function(element) {
-  let code = document.getElementById('code').value;
+  accessToken = document.getElementById('code').value;
 
-  if(code) {
-    axios.get(`http://localhost:8080/validate?code=${code}&phone=${phoneNum}`, {}).then(response => {
+  if(accessToken) {
+    axios.get(`http://localhost:8080/validate?code=${accessToken}&phone=${phoneNum}`, {}).then(response => {
       //use chrome.storage to store phone number and access token
       chrome.storage.sync.set({["BsBlock_phone"]: phoneNum});  
-      chrome.storage.sync.set({["BsBlock_token"]: code});
+      chrome.storage.sync.set({["BsBlock_token"]: accessToken});
       document.getElementById('authenticate_popup').setAttribute('class', 'hidden');
       document.getElementById('main_popup').classList.remove('hidden');
       document.getElementById('hint').classList.remove('hidden');
 
-      populateData(phoneNum, code);
+      populateData();
     }).catch(response => {
       console.log(response);
     });
@@ -66,33 +79,37 @@ updateButton.onclick = function(element) {
 
 // --- MAIN POPUP FUNCTIONALITY ---
 callButton.onclick = function(element) {
-  let phoneNumber = phoneElement.value;
   axios.put('http://localhost:8080/call', {})
     .then(response => {
       console.log("call sent successfully");
-      let numCallsStr = document.getElementById('numCalls').innerText; //skip DB hit and just get it from DOM
+      //skip DB hits and just get it from DOM
+      let numCallsStr = document.getElementById('numCalls').innerText; 
       populateFundingUI(Number.parseInt(numCallsStr) - 1);
 
       let numCallsElement = document.getElementById('numPersonalCalls');
       let numEveryoneCallsElement = document.getElementById('numEveryonesCalls');
-      numCallsElement.innerText = Number.parseInt(numCallsElement.innerText) + 1
-      numEveryoneCallsElement.innerText = Number.parseInt(numEveryoneCallsElement.innerText) + 1
+      numCallsElement.innerText = Number.parseInt(numCallsElement.innerText) + 1;
+      numEveryoneCallsElement.innerText = Number.parseInt(numEveryoneCallsElement.innerText) + 1;
+  }).catch(response => { 
+    //can't find row with phone number + token, so invalidate values in chrome storage
+    chrome.storage.sync.clear();
   });
 }
 
-function populateData(phoneNum, accessToken) {
+function setHeaders() {
   //Set default headers so that every request will have phone and access code
   axios.defaults.headers.common['phone-number'] = phoneNum;
   axios.defaults.headers.common['access-token'] = accessToken;
+}
 
+function populateData(phoneNum, accessToken) {
   axios.get(`http://localhost:8080/balance/`, {})
   .then(response => {
     populateFundingUI(response.data);
   });
 
   //TODO: refactor these 2 requests into one? This is the only place either of these endpoints are hit
-  let phoneNumber = '9093446762';
-  axios.get(`http://localhost:8080/users/${phoneNumber}`, {})
+  axios.get(`http://localhost:8080/users/${phoneNum}`, {})
   .then(response => {
     let personalCallsCount = document.getElementById('numPersonalCalls');
     let callData = response.data;
@@ -113,6 +130,12 @@ function populateData(phoneNum, accessToken) {
       everyoneCallsCount.innerText = '0';
     }
   });
+
+  //Alternate phrases 
+  let phrases = ['Uncomfortable conversations avoided: ', 'Annoying coworkers averted: ', 'Unnecessary interruptions dodged: '];
+  let phraseElement = document.getElementById('phrase');
+  let randomIndex = Math.floor(Math.random() * 3); //random number between 0 and 2
+  phraseElement.innerText = phrases[randomIndex];
 }
 
 function populateFundingUI(numCalls) {

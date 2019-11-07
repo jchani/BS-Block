@@ -15,7 +15,7 @@
           <div id="enter_code" class="hidden">
               <input id="code" type="text" name="code"  placeholder="Enter validation code here">
               <button id="validate" class="authenticate">VALIDATE</button>
-              <div id="info">Enter the validation code sent to your phone. Then you can send a call to your phone by clicking the "BS Block" Icon on the popup</div>
+              <div id="info">After validating, you can send a call to your phone by clicking the "BS Block" Icon on the popup</div>
           </div>
         </div>
     </div>
@@ -26,7 +26,7 @@
         <div id="hint" class="hidden top_left_padding">Click here to start ignoring people!</div>
       </div>
       <div class="shade">
-        <div class="bold">Uncomfortable conversations avoided: </div>
+        <div id="phrase" class="bold">Uncomfortable conversations avoided: </div>
           <div class="horizontal even">
             <div>
                 <span id="numPersonalCalls" class="calls_count">6</span>
@@ -38,12 +38,17 @@
               </div>
           </div> 
       </div>
+<<<<<<< HEAD
       <div>
+=======
+      <!-- For developlent to check whether the fields update on a call-->
+      <!-- <div>
+>>>>>>> Preventing SQL injection, added donation page and misc changes
         <button id="update">Update</button>
-      </div>
-      <div id="seperator"></div>
+      </div> -->
+     
       <div>
-        <div id="funding_barContainer">
+        <div id="funding_bar_container">
           <div id="funding_bar_background">
             <div id="funding_bar"></div>
           </div>
@@ -52,7 +57,11 @@
             <div>calls left until this runs out of funding.</div>
           </div>
         </div>
-        <div id="donate">Love this? Consider donating!</div>
+      </div>
+
+      <div id="seperator"></div>
+      <div>
+        <a id="donate" target="_blank" href="chrome-extension://egfbcgiobmhljpnjpjdhbecaecebmgle/options.html">Love this? Consider donating!</a>
       </div>
   </div>
   <script src="popup.js"></script>

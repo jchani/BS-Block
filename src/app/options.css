@@ -1,0 +1,47 @@
+body {
+  position:fixed;
+  width:100%;
+  height:100%;
+  font-family:verdana, sans-serif;
+}
+
+body:after{
+  content:"";
+  position:fixed; /* stretch a fixed position to the whole screen */
+  top:0;
+  width: 100%;
+  height:100%; 
+  left:0;
+  right:0;
+  z-index:-1; /* needed to keep in the background */
+  background-color: black;
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-size: cover;
+}
+
+#center_container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  width: 100%;
+}
+
+#modal {
+  border-radius: 20px;
+  background-color: white;
+  padding: 10px 50px 15px 50px;
+  width: 500px;
+}
+
+#vertical_container {
+  display:flex;
+  flex-direction: column;
+}
+
+form {
+  margin:auto;
+  margin-top:10px;
+}

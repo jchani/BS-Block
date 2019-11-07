@@ -1,7 +1,7 @@
 {
-  "name": "Getting Started Example",
+  "name": "BS Block",
   "version": "1.0",
-  "description": "Build an Extension!",
+  "description": "Need to dodge a distracting coworker or an uncomfortable conversation? Use this Chrome extension to call your phone",
   "permissions": ["activeTab","declarativeContent","storage", "cookies",
      "http://localhost/*",
      "https://unpkg.com/axios/dist/axios.min.js",
@@ -16,16 +16,16 @@
       "default_popup": "popup.html",
       "default_icon": {
         "16": "images/no_bs_bold.png",
-        "32": "images/get_started32.png",
-        "48": "images/get_started48.png",
-        "128": "images/get_started128.png"
+        "32": "images/no_bs_bold.png",
+        "48": "images/no_bs_bold.png",
+        "128": "images/no_bs_bold.png"
       }
     },
     "icons": {
       "16": "images/no_bs_bold.png",
-      "32": "images/get_started32.png",
-      "48": "images/get_started48.png",
-      "128": "images/get_started128.png"
+      "32": "images/no_bs_bold.png",
+      "48": "images/no_bs_bold.png",
+      "128": "images/no_bs_bold.png"
     },
   "manifest_version": 2
 }

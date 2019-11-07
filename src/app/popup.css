@@ -135,9 +135,19 @@ button.authenticate {
   padding-right: 3px;
 }
 
+#funding_bar_container {
+  padding-top: 3px;
+  padding-bottom: 3px;
+}
+
 #donate {
   margin-top: 15px;
   color: #1855ed;
+}
+
+#donate:hover {
+  font-weight: bold;
+  color: rgb(58, 167, 87);
 }
 
 

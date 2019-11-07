@@ -18,12 +18,12 @@ const pool = new Pool({
  * Checks if an existing token exists for that phone number. If yes, then overwrite. If no, then insert. 
  */
 const storeAccessToken = (phone, token) => {
-  pool.query(`SELECT token FROM users WHERE phone=${phone};`)
+  pool.query('SELECT token FROM users WHERE phone=$1;', [phone])
   .then(results => {
     if(results.rows.length > 0) { //overwrite existing token
-      updateToken(phone, token);
+      return Promise.resolve(updateToken(phone, token));
     } else { //no previously existing token for phone number
-      createUser(phone, token);
+      return Promise.resolve(createUser(phone, token));
     }
   })
   .catch(error => console.log(error));
@@ -35,7 +35,7 @@ const storeAccessToken = (phone, token) => {
 const validatePhoneAndAccessToken = (phone, token) => {
   const dummyVar = "blah";
   return new Promise((resolve, reject) => {
-    pool.query(`SELECT token FROM users WHERE phone=${phone} AND token='${token}'`)
+    pool.query(`SELECT token FROM users WHERE phone=$1 AND token=$2`, [phone, token])
     .then(results => resolve(results.rows.length > 0 ? true : false))
     .catch(error => reject(error))
   });
@@ -53,13 +53,25 @@ const incrementCalls = (phone) => {
  * --- GENERIC METHODS ---
  */
 const createUser = (phone, token) => {
-  pool.query(`INSERT INTO users(phone,calls,paid,token) VALUES (${phone}, 0, 0, '${token}');`)
-  .catch(error => console.log(error));
+  pool.query(`INSERT INTO users(phone,calls,paid,token) VALUES ($1, 0, 0, $2);`, [phone ,token])
+  .then(x => {
+    return Promise.resolve();
+  })
+  .catch(error => {
+    console.log(error);
+    Promise.reject(error);
+  });
 }
 
 const updateToken = (phone, token) => {
-  pool.query(`UPDATE users SET token='${token}' WHERE phone=${phone};`)
-  .catch(error => console.log(error));
+  pool.query(`UPDATE users SET token=$2 WHERE phone=$1;`, [phone, token])
+  .then(x => {
+    return Promise.resolve()
+  })
+  .catch(error => {
+    console.log(error);
+    return Promise.reject(error);
+  });
 }
 
 /**
@@ -67,7 +79,7 @@ const updateToken = (phone, token) => {
  */
 const getCallDataByPhone = (phone) => {
   return new Promise((resolve, reject) => {
-    pool.query(`SELECT phone, calls FROM users WHERE phone = ${phone}`)
+    pool.query(`SELECT phone, calls FROM users WHERE phone = $1`, [phone])
     .then(results => results.rows)
     .catch(error => console.log(error));
   });
