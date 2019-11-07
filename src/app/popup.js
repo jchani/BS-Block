@@ -73,10 +73,6 @@ validateButton.onclick = function(element) {
   }
 }
 
-updateButton.onclick = function(element) {
-  initial();
-}
-
 // --- MAIN POPUP FUNCTIONALITY ---
 callButton.onclick = function(element) {
   axios.put('http://localhost:8080/call', {})
@@ -90,6 +86,7 @@ callButton.onclick = function(element) {
       let numEveryoneCallsElement = document.getElementById('numEveryonesCalls');
       numCallsElement.innerText = Number.parseInt(numCallsElement.innerText) + 1;
       numEveryoneCallsElement.innerText = Number.parseInt(numEveryoneCallsElement.innerText) + 1;
+      window.close();
   }).catch(response => { 
     //can't find row with phone number + token, so invalidate values in chrome storage
     chrome.storage.sync.clear();
@@ -102,7 +99,7 @@ function setHeaders() {
   axios.defaults.headers.common['access-token'] = accessToken;
 }
 
-function populateData(phoneNum, accessToken) {
+function populateData() {
   axios.get(`http://localhost:8080/balance/`, {})
   .then(response => {
     populateFundingUI(response.data);

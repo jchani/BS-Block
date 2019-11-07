@@ -114,8 +114,9 @@ app.put('/call', (request, response) => {
         from: '+14088829909'
       })
       .then(call => {
-        db.incrementCalls(phone);
-        response.status(200).send();
+        db.incrementCalls(phone)
+        .then(x => response.status(200).send())
+        .catch(x => response.status(500).send());
       })
       .catch(x => {
         console.log("Out of funds or API limit reached");
