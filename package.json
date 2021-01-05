@@ -22,7 +22,7 @@
     "webpack-cli": "^3.3.2"
   },
   "dependencies": {
-    "axios": "^0.18.0",
+    "axios": "^0.21.1",
     "babel-core": "^6.26.3",
     "cookie-parser": "^1.4.4",
     "dotenv": "^8.0.0",
